@@ -18,5 +18,11 @@ public interface MmallUserMapper {
 
     int checkUsername(String username);
 
+    int checkEmail(@Param("email") String email);
+
     MmallUser selectLogin(@Param("username") String username, @Param("password") String password);
+
+    String selectQuestionByUsername(@Param("username") String username);
+
+    int checkAnswer(@Param("username") String username, @Param("question") String question, @Param("answer") String answer);
 }
