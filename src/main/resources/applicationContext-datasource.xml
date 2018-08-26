@@ -26,7 +26,7 @@
 
     <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${db.driverClassName}"/>
-        <property name="url" value="${db.url}"/>
+        <property name="url" value="${db.url}"/><!---->
         <property name="username" value="${db.username}"/>
         <property name="password" value="${db.password}"/>
         <!-- 连接池启动时的初始值 -->
@@ -67,7 +67,7 @@
                 <bean class="com.github.pagehelper.PageInterceptor">
                     <property name="properties">
                         <value>
-                            dialect=mysql
+                            helperDialect=mysql
                         </value>
                     </property>
                 </bean>
