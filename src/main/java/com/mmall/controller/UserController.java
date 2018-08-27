@@ -52,7 +52,7 @@ public class UserController {
     @ResponseBody
     public ServerResponse<String> logout(HttpSession session) {
         session.removeAttribute(Const.CURRENT_USER);
-        return ServerResponse.createBySuccess("等出成功～～");
+        return ServerResponse.createBySuccess("登出成功～～");
     }
 
     /**
