@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
 @Service("iUserService")
@@ -129,10 +130,92 @@ public class UserServiceImpl implements IUserService {
         if (resultCount > 0) {
             String forgetToken = UUID.randomUUID().toString();
             // 添加本地缓存。
-            TokenCache.setKey("token_" + username, forgetToken);
+            TokenCache.setKey(TokenCache.TOKEN_PREFIX + username, forgetToken);
             return ServerResponse.createBySuccess(forgetToken);
         }
         return ServerResponse.createByErrorMessage("问题答案错误～～");
+    }
+
+    /**
+     * 重置密码
+     *
+     * @param username
+     * @param passwordNew
+     * @param forgetToken
+     * @return
+     */
+    public ServerResponse<String> forgetResetPassword(String username, String passwordNew, String forgetToken) {
+        if (StringUtils.isBlank(forgetToken)) {
+            return ServerResponse.createByErrorMessage("参数错误, token 需要传递～～");
+        }
+        ServerResponse validResponse = this.checkValid(username, Const.USERNAME);
+        if (!validResponse.isSuccess()) {
+            return ServerResponse.createByErrorMessage("用户不存在～～");
+        }
+        String token = TokenCache.getKey(TokenCache.TOKEN_PREFIX + username);
+
+        if (StringUtils.isBlank(token)) {
+            return ServerResponse.createByErrorMessage("token 无效或者过期～～");
+        }
+        if (StringUtils.equals(forgetToken, token)) {
+            String md5Password = MD5Util.MD5EncodeUtf8(passwordNew);
+            int rowCount = userMapper.updatePasswordByUsername(username, md5Password);
+            if (rowCount > 0) {
+                return ServerResponse.createBySuccessMessage("修改密码成功～～");
+            }
+        } else {
+            return ServerResponse.createByErrorMessage("token 错误，请重新设置 token～～");
+        }
+        return ServerResponse.createByErrorMessage("修改密码失败～～");
+    }
+
+    public ServerResponse<String> resetPassword(String passwordOld, String passwordNew, MmallUser user) {
+        //防止横向越权。一定要指定用户的 id 。
+        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), user.getId());
+        if (resultCount == 0) {
+            return ServerResponse.createByErrorMessage("用户密码错误～～");
+        }
+        user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
+        int updateCount = userMapper.updateByPrimaryKeySelective(user);
+        if (updateCount == 0) {
+            return ServerResponse.createByErrorMessage("用户密码更新失败～～");
+        }
+        return ServerResponse.createBySuccessMessage("用户密码更新成功～～");
+    }
+
+    /**
+     * 更新用户信息
+     *
+     * @param user
+     * @return
+     */
+    public ServerResponse<MmallUser> updateInformation(MmallUser user) {
+        // 用户的 username 是不能被更新的。
+        // email 也要被校验，看看是否已经被占用
+        int resultCount = userMapper.checkEmailByUserId(user.getEmail(), user.getId());
+        if (resultCount > 0) {
+            return ServerResponse.createByErrorMessage("邮箱已经被占用～～");
+        }
+        MmallUser updateUser = new MmallUser();
+        updateUser.setId(user.getId());
+        updateUser.setEmail(user.getEmail());
+        updateUser.setPhone(user.getPhone());
+        updateUser.setQuestion(user.getQuestion());
+        updateUser.setAnswer(user.getAnswer());
+        int updateCount = userMapper.updateByPrimaryKeySelective(updateUser);
+        if (updateCount > 0) {
+            return ServerResponse.createBySuccess("更新个人信息成功～～", updateUser);
+        }
+        return ServerResponse.createByErrorMessage("更新个人信息失败～～");
+    }
+
+    public ServerResponse<MmallUser> getInformation(Integer userId) {
+        MmallUser user = userMapper.selectByPrimaryKey(userId);
+        if (user == null) {
+            return ServerResponse.createByErrorMessage("找不到当前登陆用户～～");
+        }
+        user.setPassword(StringUtils.EMPTY);
+        return ServerResponse.createBySuccess(user);
     }
 
 }
