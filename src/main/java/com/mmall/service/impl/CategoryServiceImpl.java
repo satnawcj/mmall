@@ -33,7 +33,7 @@ public class CategoryServiceImpl implements ICategoryService {
      */
     public ServerResponse addCategory(String categoryName, Integer parentId) {
         if (parentId == null || StringUtils.isBlank(categoryName)) {
-            return ServerResponse.createByErrorMessage("添加品类参数错误～～");
+            return ServerResponse.createByErrorMessage("添加品类参数错误~~");
         }
         MmallCategory category = new MmallCategory();
         category.setName(categoryName);
@@ -41,9 +41,9 @@ public class CategoryServiceImpl implements ICategoryService {
         category.setStatus(true);//分类可用
         int rowCount = categoryMapper.insert(category);
         if (rowCount > 0) {
-            return ServerResponse.createBySuccess("添加品类成功～～");
+            return ServerResponse.createBySuccess("添加品类成功~~");
         }
-        return ServerResponse.createByErrorMessage("添加品类失败～～");
+        return ServerResponse.createByErrorMessage("添加品类失败~~");
     }
 
     /**
@@ -55,16 +55,16 @@ public class CategoryServiceImpl implements ICategoryService {
      */
     public ServerResponse updateCategoryName(Integer categoryId, String categoryName) {
         if (categoryId == null || StringUtils.isBlank(categoryName)) {
-            return ServerResponse.createByErrorMessage("更新品类参数错误～～");
+            return ServerResponse.createByErrorMessage("更新品类参数错误~~");
         }
         MmallCategory category = new MmallCategory();
         category.setId(categoryId);
         category.setName(categoryName);
         int rowCount = categoryMapper.updateByPrimaryKeySelective(category);
         if (rowCount > 0) {
-            return ServerResponse.createBySuccess("更新品类名字成功～～");
+            return ServerResponse.createBySuccess("更新品类名字成功~~");
         }
-        return ServerResponse.createByErrorMessage("更新品类名字失败～～");
+        return ServerResponse.createByErrorMessage("更新品类名字失败~~");
     }
 
     /**
@@ -76,7 +76,7 @@ public class CategoryServiceImpl implements ICategoryService {
     public ServerResponse<List<MmallCategory>> getChildParallelCategory(Integer categoryId) {
         List<MmallCategory> categoryList = categoryMapper.selectCategoryChildrenByParentId(categoryId);
         if (CollectionUtils.isEmpty(categoryList)) {
-            logger.info("未找到当前分类的子分类～～");
+            logger.info("未找到当前分类的子分类~~");
         }
         return ServerResponse.createBySuccess(categoryList);
     }
@@ -87,7 +87,7 @@ public class CategoryServiceImpl implements ICategoryService {
      * @param categoryId
      * @return
      */
-    public ServerResponse selectCategoryAndChildrenById(Integer categoryId) {
+    public ServerResponse<List<Integer>> selectCategoryAndChildrenById(Integer categoryId) {
         Set<MmallCategory> categorySet = Sets.newHashSet();
         findChildCategory(categorySet, categoryId);
         List<Integer> categoryIdList = Lists.newArrayList();

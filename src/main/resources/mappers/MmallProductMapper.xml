@@ -178,7 +178,7 @@
       update_time = now(),
       sub_images = #{subImages,jdbcType=LONGVARCHAR},
       detail = #{detail,jdbcType=LONGVARCHAR}
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER};
   </update>
     <update id="updateByPrimaryKey" parameterType="com.mmall.pojo.MmallProduct">
     update mmall_product
@@ -191,6 +191,49 @@
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()
-    where id = #{id,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER};
   </update>
+
+    <select id="selectList" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        FROM mmall_product
+        ORDER BY id ASC
+    </select>
+    <select id="selectByNameAndProductId" resultMap="BaseResultMap" parameterType="map">
+        SELECT
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        FROM mmall_product
+        <where>
+            <if test="productName != null">
+                AND productName LIKE #{productName}
+            </if>
+            <if test="productId != null">
+                AND id = #{productId}
+            </if>
+        </where>
+        ORDER BY id ASC
+    </select>
+
+    <select id="selectByNameAndCategoryIds" parameterType="map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        FROM mmall_product
+        WHERE status = 1
+        <if test="productName != null">
+            AND name LIKE #{productName}
+        </if>
+        <if test="categoryIdList != null">
+            AND category_id in
+            <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

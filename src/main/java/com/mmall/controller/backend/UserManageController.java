@@ -40,7 +40,7 @@ public class UserManageController {
                 session.setAttribute(Const.CURRENT_USER, user);
                 return res;
             } else {
-                return ServerResponse.createByErrorMessage("无此权限～～");
+                return ServerResponse.createByErrorMessage("无此权限~~");
             }
         }
         return res;

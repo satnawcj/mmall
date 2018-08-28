@@ -52,7 +52,7 @@ public class UserController {
     @ResponseBody
     public ServerResponse<String> logout(HttpSession session) {
         session.removeAttribute(Const.CURRENT_USER);
-        return ServerResponse.createBySuccess("登出成功～～");
+        return ServerResponse.createBySuccess("登出成功~~");
     }
 
     /**
@@ -93,7 +93,7 @@ public class UserController {
         if (user != null) {
             return ServerResponse.createBySuccess(user);
         }
-        return ServerResponse.createByErrorMessage("用户未登陆～～");
+        return ServerResponse.createByErrorMessage("用户未登陆~~");
     }
 
     /**
@@ -151,7 +151,7 @@ public class UserController {
     public ServerResponse<String> resetPassword(HttpSession session, String passwordOld, String passwordNew) {
         MmallUser user = (MmallUser) session.getAttribute(Const.CURRENT_USER);
         if (user == null) {
-            return ServerResponse.createByErrorMessage("用户未登陆～～");
+            return ServerResponse.createByErrorMessage("用户未登陆~~");
         }
         return iUserService.resetPassword(passwordOld, passwordNew, user);
     }
@@ -168,7 +168,7 @@ public class UserController {
     public ServerResponse<MmallUser> updateInformation(HttpSession session, MmallUser user) {
         MmallUser currUser = (MmallUser) session.getAttribute(Const.CURRENT_USER);
         if (currUser == null) {
-            return ServerResponse.createByErrorMessage("用户未登陆～～");
+            return ServerResponse.createByErrorMessage("用户未登陆~~");
         }
         user.setId(currUser.getId());
         user.setUsername(currUser.getUsername());
@@ -190,7 +190,7 @@ public class UserController {
     public ServerResponse<MmallUser> getInformation(HttpSession session) {
         MmallUser currUser = (MmallUser) session.getAttribute(Const.CURRENT_USER);
         if (currUser == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "未登陆，要强制登陆，status = 10～～");
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(), "未登陆，要强制登陆，status = 10~~");
         }
         return iUserService.getInformation(currUser.getId());
     }
