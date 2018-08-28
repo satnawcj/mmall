@@ -33,4 +33,6 @@ public interface MmallCartMapper {
                                   @Param("checked") Integer checked);
 
     int selectCartProductCount(@Param("userId") Integer userId);
+
+    List<MmallCart> selectCheckedCartByUserId(@Param("userId") Integer userId);
 }
