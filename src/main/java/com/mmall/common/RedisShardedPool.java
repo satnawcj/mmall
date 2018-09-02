@@ -1,8 +1,6 @@
 package com.mmall.common;
 
 import com.mmall.util.PropertiesUtil;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisShardInfo;
 import redis.clients.jedis.ShardedJedis;
@@ -77,19 +75,5 @@ public class RedisShardedPool {
     public static void returnResource(ShardedJedis jedis) {
         pool.returnResource(jedis);
     }
-
-
-    public static void main(String[] args) {
-        ShardedJedis jedis = pool.getResource();
-
-        for (int i = 0; i < 10; i++) {
-            jedis.set("key" + i, "value" + i);
-        }
-        returnResource(jedis);
-
-//        pool.destroy();//临时调用，销毁连接池中的所有连接
-        System.out.println("program is end");
-
-
-    }
+    
 }
