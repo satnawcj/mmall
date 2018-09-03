@@ -27,5 +27,9 @@ public interface MmallOrderMapper {
 
     List<MmallOrder> selectAllOrder();
 
+    //二期新增定时关单
+    List<MmallOrder> selectOrderStatusByCreateTime(@Param("status") Integer status, @Param("date") String date);
+
+    int closeOrderByOrderId(Integer id);
 
 }

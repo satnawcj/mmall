@@ -27,8 +27,10 @@ import com.mmall.vo.OrderItemVo;
 import com.mmall.vo.OrderProductVo;
 import com.mmall.vo.OrderVo;
 import com.mmall.vo.ShippingVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service("iOrderService")
+@Slf4j
 public class OrderServiceImpl implements IOrderService {
 
     @Autowired
@@ -449,6 +452,39 @@ public class OrderServiceImpl implements IOrderService {
             }
         }
         return ServerResponse.createByErrorMessage("订单不存在~~");
+    }
+
+    /**
+     * 关闭订单的方法
+     *
+     * @param hour
+     */
+    @Override
+    public void closeOrder(int hour) {
+        // 关单时间
+        Date closeDateTime = DateUtils.addHours(new Date(), -hour);
+        List<MmallOrder> orderList = orderMapper
+                .selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(),
+                        DateTimeUtil.dateToStr(closeDateTime));
+        for (MmallOrder order : orderList) {
+            List<MmallOrderItem> orderItemList = orderItemMapper.getByOrderNo(order.getOrderNo());
+            for (MmallOrderItem orderItem : orderItemList) {
+
+                //一定要用主键where条件，防止锁表。同时必须是支持MySQL的InnoDB。
+                Integer stock = productMapper.selectStockByProductId(orderItem.getProductId());
+
+                //考虑到已生成的订单里的商品，被删除的情况
+                if (stock == null) {
+                    continue;
+                }
+                MmallProductWithBLOBs product = new MmallProductWithBLOBs();
+                product.setId(orderItem.getProductId());
+                product.setStock(stock + orderItem.getQuantity());
+                productMapper.updateByPrimaryKeySelective(product);
+            }
+            orderMapper.closeOrderByOrderId(order.getId());
+            log.info("关闭订单OrderNo：{}", order.getOrderNo());
+        }
     }
 
     // 生成订单包括的每一个项目
